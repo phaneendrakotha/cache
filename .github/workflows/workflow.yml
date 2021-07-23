@@ -26,17 +26,21 @@ jobs:
       with:
         node-version: '14'
         cache: npm
-    - name: Determine npm cache directory
-      id: cache
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
+#     - name: Determine npm cache directory
+#       id: cache
+#       run: |
+#         echo "::set-output name=dir::$(npm config get cache)"
     - name: Restore npm cache
       uses: actions/cache@v2
       with:
-        path: ${{ steps.cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        env:
+        cache-name: npm
+        path: node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-node-
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
     - name: Install node dependencies     
       if: steps.cache.outputs.cache-hit != 'true'
       run: npm ci
